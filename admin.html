@@ -36,7 +36,7 @@
         toggleAudio.addEventListener("change", () => {
             if (toggleAudio.checked) {
                 // Connect to WebSocket server
-                socket = new WebSocket("ws://localhost:8080");
+                const socket = new WebSocket("wss://istreamaudio.onrender.com");
                 socket.binaryType = "arraybuffer";
                 const audioContext = new AudioContext();
                 const source = audioContext.createBufferSource();
