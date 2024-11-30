@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #333;
+            color: white;
+        }
+        .toggle {
+            margin-top: 20px;
+        }
+        audio {
+            margin-top: 30px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <label class="toggle">
+        <input type="checkbox" id="toggleAudio">
+        Toggle Audio Stream
+    </label>
+    <audio id="audioPlayer" controls></audio>
+
+    <script>
+        const toggleAudio = document.getElementById("toggleAudio");
+        const audioPlayer = document.getElementById("audioPlayer");
+        let socket;
+
+        toggleAudio.addEventListener("change", () => {
+            if (toggleAudio.checked) {
+                // Connect to WebSocket server
+                socket = new WebSocket("ws://localhost:8080");
+                socket.binaryType = "arraybuffer";
+                const audioContext = new AudioContext();
+                const source = audioContext.createBufferSource();
+
+                socket.onmessage = async (event) => {
+                    const audioBuffer = await audioContext.decodeAudioData(event.data);
+                    source.buffer = audioBuffer;
+                    source.connect(audioContext.destination);
+                    source.start();
+                };
+            } else {
+                // Disconnect WebSocket
+                if (socket) socket.close();
+                audioPlayer.src = "";
+            }
+        });
+    </script>
+</body>
+</html>

