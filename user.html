@@ -36,7 +36,7 @@
                 const source = audioContext.createMediaStreamSource(stream);
 
                 // Send audio stream to the server
-                const socket = new WebSocket("ws://localhost:8080");
+                const socket = new WebSocket("wss://websocket-server.onrender.com");
                 socket.onopen = () => {
                     const recorder = new MediaRecorder(stream);
                     recorder.ondataavailable = (event) => {
